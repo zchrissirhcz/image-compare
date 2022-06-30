@@ -34,6 +34,7 @@ cv::Mat load_fourcc_and_convert_to_mat(const FileInfo& file_info)
     const std::string& ext = file_info.ext;
     if (ext == "nv21" || ext == "nv12" || ext == "i420" || ext == "yv12" // 3/2
         || ext == "uyvy" || ext == "yuyv" || ext == "yvyu" // 2
+        || ext == "yv24" // 3
         )
     {
         int height = file_info.height;
@@ -107,6 +108,15 @@ cv::Mat load_fourcc_and_convert_to_mat(const FileInfo& file_info)
             fread(yuv_buf, buf_size, 1, fin);
             fclose(fin);
             cv::cvtColor(yuv422_mat, image, cv::COLOR_YUV2BGR_YVYU);
+        }
+        else if (ext == "yv24")
+        {
+            int buf_size = height * width * 3;
+            cv::Mat yuv444_mat(height, width, CV_8UC3);
+            uchar* yuv_buf = yuv444_mat.data;
+            fread(yuv_buf, buf_size, 1, fin);
+            fclose(fin);
+            cv::cvtColor(yuv444_mat, image, cv::COLOR_YUV2BGR);
         }
     }
     else if (ext == "bgr24" || ext == "rgb24" || ext == "rgba32" || ext == "bgra32" || ext == "gray")
@@ -218,6 +228,10 @@ FileInfo get_meta_info(const std::string& filename)
             {
                 ext = "gray";
             }
+            else if (ext == "i444")
+            {
+                ext = "yv24";
+            }
         }
         file_info.head = head;
         file_info.ext = ext;
@@ -317,6 +331,10 @@ FileInfo get_meta_info(const std::string& filename)
         else if (ext == "uyvy" || ext == "yuyv" || ext == "yvyu")
         {
             expected_size = height * width * 2;
+        }
+        else if (ext == "yv24")
+        {
+            expected_size = height * width * 3;
         }
 
         if (expected_size != actual_size)
@@ -427,6 +445,7 @@ std::vector<std::string> imcmp::get_supported_image_file_exts()
         // not supported yet
         "i444",
         "yv24",
+
         "uyvy2",
         "vyuy",
         "vyuy2",
