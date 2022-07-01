@@ -20,7 +20,7 @@
 
 #define STR_IMPLEMENTATION
 #include "Str.h"
-
+#include "asvl_process.hpp"
 using namespace imcmp;
 
 class MyApp : public App<MyApp>
@@ -546,7 +546,10 @@ int MyApp::UI_ChooseImageFile()
     pfd::settings::verbose(true);
 
     // NOTE: file extension filter not working on macOSX
-    auto f = pfd::open_file("Choose image file", pfd::path::home(),
+    auto f = pfd::open_file("Choose image file", 
+                            //pfd::path::home(),
+                            "/home/zz/work/plain/asvl",
+                            
                             //{"Image Files (.jpg .png .jpeg .bmp .nv21 .nv12 .rgb24 .bgr24)", "*.jpg *.png *.jpeg *.bmp *.nv21 *.nv12 *.rgb24 *.bgr24",
                             {filter_msg1, filter_msg2, "All Files", "*"}
                             //pfd::opt::multiselect
